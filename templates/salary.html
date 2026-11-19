@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Salary - Memoraa{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h3><i class="bi bi-cash-stack"></i> Salary</h3>
+    <p class="text-muted">Monthly Base Salary: <strong>₹{{ "{:,.2f}".format(salary or 0) }}</strong></p>
+</div>
+
+<div class="card">
+    <div class="card-header bg-white">
+        <h5 class="mb-0">Download Salary Slip</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            {% for m in months %}
+            <div class="col-md-4 col-lg-3">
+                <a href="{{ url_for('salary_slip', month=m) }}" class="btn btn-outline-dark w-100">
+                    <i class="bi bi-file-earmark-pdf"></i> {{ m }}
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

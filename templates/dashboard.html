@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - Memoraa{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="mb-0">Welcome, {{ current_user.name }}</h3>
+        <p class="text-muted mb-0">{{ today.strftime('%A, %d %B %Y') }}</p>
+    </div>
+    <a href="{{ url_for('punch') }}" class="btn btn-gold">
+        <i class="bi bi-geo-alt-fill"></i> Punch Now
+    </a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <p class="text-muted mb-1 small">Today's Status</p>
+                        {% if attendance_today and attendance_today.punch_in_time %}
+                            {% if attendance_today.punch_out_time %}
+                                <h5 class="text-success mb-0">Completed</h5>
+                            {% else %}
+                                <h5 class="text-primary mb-0">Punched In</h5>
+                            {% endif %}
+                        {% else %}
+                            <h5 class="text-warning mb-0">Not Punched</h5>
+                        {% endif %}
+                    </div>
+                    <i class="bi bi-clock-history fs-3 text-muted"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <p class="text-muted mb-1 small">Present Days (This Month)</p>
+                        <h5 class="mb-0">{{ present_days }}</h5>
+                    </div>
+                    <i class="bi bi-calendar-check fs-3 text-success"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <p class="text-muted mb-1 small">My Pending Requests</p>
+                        <h5 class="mb-0">{{ pending_regs }}</h5>
+                    </div>
+                    <i class="bi bi-hourglass-split fs-3 text-warning"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if current_user.is_manager() %}
+    <div class="col-md-3">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <p class="text-muted mb-1 small">Team Approvals Pending</p>
+                        <h5 class="mb-0">{{ team_pending }}</h5>
+                    </div>
+                    <i class="bi bi-clipboard-check fs-3 text-danger"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="bi bi-geo-alt"></i> Today's Punch</h5>
+            </div>
+            <div class="card-body">
+                {% if attendance_today %}
+                    <div class="row">
+                        <div class="col-6">
+                            <p class="text-muted small mb-1">Punch In</p>
+                            <h5>{{ attendance_today.punch_in_time.strftime('%H:%M:%S') if attendance_today.punch_in_time else '—' }}</h5>
+                        </div>
+                        <div class="col-6">
+                            <p class="text-muted small mb-1">Punch Out</p>
+                            <h5>{{ attendance_today.punch_out_time.strftime('%H:%M:%S') if attendance_today.punch_out_time else '—' }}</h5>
+                        </div>
+                    </div>
+                    {% if attendance_today.punch_in_time and attendance_today.punch_out_time %}
+                        <hr>
+                        <p class="mb-0">Working Hours: <strong>{{ attendance_today.working_hours() }}</strong></p>
+                    {% endif %}
+                {% else %}
+                    <p class="text-muted mb-0">You have not punched in today.</p>
+                    <a href="{{ url_for('punch') }}" class="btn btn-sm btn-gold mt-2">Punch In Now</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-calendar-event"></i> Upcoming Holidays</h5>
+                <a href="{{ url_for('holidays') }}" class="btn btn-sm btn-outline-secondary">View All</a>
+            </div>
+            <div class="card-body p-0">
+                {% if holidays %}
+                    <ul class="list-group list-group-flush">
+                        {% for h in holidays %}
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>{{ h.name }}</span>
+                            <span class="text-muted">{{ h.date.strftime('%d %b %Y') }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted p-3 mb-0">No upcoming holidays.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

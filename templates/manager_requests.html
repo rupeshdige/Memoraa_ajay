@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Approvals - Memoraa{% endblock %}
+
+{% block content %}
+<h3 class="mb-4"><i class="bi bi-clipboard-check"></i> Pending Regularization Requests</h3>
+
+{% if requests %}
+<div class="row g-3">
+    {% for r in requests %}
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <h5 class="mb-0">{{ r.employee.name }}</h5>
+                    <span class="badge bg-secondary">{{ r.employee.emp_id }}</span>
+                </div>
+                <p class="text-muted small mb-2">
+                    <i class="bi bi-calendar"></i> {{ r.date.strftime('%d %b %Y') }}
+                </p>
+                <p class="mb-1">
+                    <strong>In:</strong> {{ r.requested_punch_in.strftime('%H:%M') if r.requested_punch_in else '—' }}
+                    &nbsp;|&nbsp;
+                    <strong>Out:</strong> {{ r.requested_punch_out.strftime('%H:%M') if r.requested_punch_out else '—' }}
+                </p>
+                <p class="mb-3"><strong>Reason:</strong> {{ r.reason }}</p>
+
+                <form method="POST" action="{{ url_for('review_request', req_id=r.id, action='approve') }}" class="d-inline">
+                    <input type="text" name="comment" class="form-control form-control-sm mb-2" placeholder="Optional comment">
+                    <button type="submit" class="btn btn-success btn-sm">
+                        <i class="bi bi-check-lg"></i> Approve
+                    </button>
+                </form>
+                <form method="POST" action="{{ url_for('review_request', req_id=r.id, action='reject') }}" class="d-inline">
+                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-x-lg"></i> Reject
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info">No pending requests.</div>
+{% endif %}
+{% endblock %}

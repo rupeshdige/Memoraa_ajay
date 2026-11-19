@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Punch - Memoraa{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h4 class="mb-0"><i class="bi bi-geo-alt-fill"></i> Punch In / Out</h4>
+                <p class="text-muted small mb-0">{{ today.strftime('%A, %d %B %Y') }}</p>
+            </div>
+            <div class="card-body text-center py-5">
+                {% if attendance %}
+                    <div class="row mb-4">
+                        <div class="col-6">
+                            <p class="text-muted small">Punch In</p>
+                            <h4 class="text-success">
+                                {{ attendance.punch_in_time.strftime('%H:%M:%S') if attendance.punch_in_time else '—' }}
+                            </h4>
+                        </div>
+                        <div class="col-6">
+                            <p class="text-muted small">Punch Out</p>
+                            <h4 class="text-danger">
+                                {{ attendance.punch_out_time.strftime('%H:%M:%S') if attendance.punch_out_time else '—' }}
+                            </h4>
+                        </div>
+                    </div>
+                    {% if attendance.punch_in_time and attendance.punch_out_time %}
+                        <div class="alert alert-success">
+                            Working Hours: <strong>{{ attendance.working_hours() }}</strong>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <p class="text-muted mb-4">You have not punched in today.</p>
+                {% endif %}
+
+                <form method="POST" id="punchForm">
+                    <input type="hidden" name="lat" id="lat">
+                    <input type="hidden" name="lng" id="lng">
+
+                    {% if not attendance or not attendance.punch_in_time %}
+                        <button type="submit" name="action" value="punch_in" class="btn btn-success btn-lg px-5">
+                            <i class="bi bi-box-arrow-in-right"></i> Punch IN
+                        </button>
+                    {% elif not attendance.punch_out_time %}
+                        <button type="submit" name="action" value="punch_out" class="btn btn-danger btn-lg px-5">
+                            <i class="bi bi-box-arrow-right"></i> Punch OUT
+                        </button>
+                    {% else %}
+                        <div class="alert alert-info mb-0">
+                            You have completed attendance for today.
+                        </div>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Get location when page loads
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+        function(pos) {
+            document.getElementById('lat').value = pos.coords.latitude;
+            document.getElementById('lng').value = pos.coords.longitude;
+        },
+        function(err) {
+            console.log("Location access denied or unavailable");
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+    );
+}
+</script>
+{% endblock %}
